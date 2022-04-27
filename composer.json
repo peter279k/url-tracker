@@ -1,0 +1,53 @@
+{
+   "name": "lee/url-tracker",
+   "type": "library",
+   "description": "Shorten Url Tracker",
+   "keywords": [
+      "tracker",
+      "url"
+   ],
+   "homepage": "https://github.com/peter279k/url-tracker",
+   "license": "MIT",
+   "require": {
+      "php": ">=7.4",
+      "guzzlehttp/guzzle": "^7.0"
+   },
+   "require-dev": {
+      "friendsofphp/php-cs-fixer": "^3",
+      "overtrue/phplint": "^2.3",
+      "phpunit/phpunit": "^9.5",
+      "phpstan/phpstan": "^1",
+      "squizlabs/php_codesniffer": "^3.5"
+   },
+   "scripts": {
+      "check": [
+          "@lint",
+          "@cs:check",
+          "@sniffer:check",
+          "@phpstan",
+          "@test:coverage"
+      ],
+      "cs:check": "php-cs-fixer fix --dry-run --format=txt --verbose --diff --config=.cs.php",
+      "cs:fix": "php-cs-fixer fix --config=.cs.php",
+      "lint": "phplint ./ --exclude=vendor --no-interaction --no-cache",
+      "phpstan": "phpstan analyse src tests --level=max -c phpstan.neon --no-progress --ansi",
+      "sniffer:check": "phpcs --standard=phpcs.xml",
+      "sniffer:fix": "phpcbf --standard=phpcs.xml",
+      "test": "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always",
+      "test:coverage": "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always --coverage-clover build/logs/clover.xml --coverage-html build/coverage"
+  },
+  "autoload": {
+      "psr-4": {
+          "Lee\\": "src"
+      }
+  },
+  "autoload-dev": {
+     "psr-4": {
+        "Lee\\Tests\\": "tests"
+     }
+  },
+  "config": {
+      "sort-packages": true,
+      "process-timeout": 0
+   }
+}
