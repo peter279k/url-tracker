@@ -1,4 +1,5 @@
 # url-tracker
+[![build](https://github.com/peter279k/url-tracker/actions/workflows/build.yml/badge.svg)](https://github.com/peter279k/url-tracker/actions/workflows/build.yml)
 
 # Introduction
 
