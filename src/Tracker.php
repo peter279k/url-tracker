@@ -3,9 +3,8 @@
 namespace Lee;
 
 use GuzzleHttp\Client;
-use Lee\Result\Set;
 use Lee\Result\Result;
-use InvalidArgumentException;
+use Lee\Result\Set;
 
 class Tracker
 {
@@ -63,7 +62,7 @@ class Tracker
         if ($validatedResult === false) {
             $exceptionMessage = sprintf('The %s is invalid.', $url);
 
-            throw new InvalidArgumentException($exceptionMessage);
+            throw new \InvalidArgumentException($exceptionMessage);
         }
 
         return true;
