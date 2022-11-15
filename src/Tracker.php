@@ -3,6 +3,8 @@
 namespace Lee;
 
 use GuzzleHttp\Client;
+use Lee\Result\Set;
+use Lee\Result\Result;
 use InvalidArgumentException;
 
 class Tracker
@@ -17,35 +19,29 @@ class Tracker
 
     /**
      * track url with static method call.
-     *
-     * @return array<string>
      */
-    public static function trackFromUrl(string $url): array
+    public static function trackFromUrl(string $url): Set
     {
         self::validateUrl($url);
-
-        $trackedUrl = [$url];
         $client = new Client();
-        $response = $client->request('GET', $url, [
-            'allow_redirects' => false,
-        ]);
+        $results = new Set();
+        $response = $client->request('GET', $url, ['allow_redirects' => false]);
+        $results->add(new Result($response->getStatusCode(), $url, $response->getHeaders()));
         while ($response->hasHeader('Location') === true) {
-            $trackedUrl[] = $response->getHeader('Location')[0];
-            $url = $trackedUrl[count($trackedUrl) - 1];
-            $response = $client->request('GET', $url, [
-                'allow_redirects' => false,
-            ]);
+            $redirectUrl = $response->getHeader('Location')[0];
+            $response = $client->request('GET', $redirectUrl, ['allow_redirects' => false]);
+            $code = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            $results->add(new Result($code, $redirectUrl, $headers));
         }
 
-        return $trackedUrl;
+        return $results;
     }
 
     /**
      * track method.
-     *
-     * @return array<string>
      */
-    public function track(): array
+    public function track(): Set
     {
         return self::trackFromUrl(self::$url);
     }
