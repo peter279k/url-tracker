@@ -3,7 +3,8 @@
 namespace Lee;
 
 use GuzzleHttp\Client;
-use InvalidArgumentException;
+use Lee\Result\Result;
+use Lee\Result\Set;
 
 class Tracker
 {
@@ -17,35 +18,30 @@ class Tracker
 
     /**
      * track url with static method call.
-     *
-     * @return array<string>
      */
-    public static function trackFromUrl(string $url): array
+    public static function trackFromUrl(string $url): Set
     {
         self::validateUrl($url);
 
-        $trackedUrl = [$url];
         $client = new Client();
-        $response = $client->request('GET', $url, [
-            'allow_redirects' => false,
-        ]);
+        $response = $client->request('GET', $url, ['allow_redirects' => false]);
+        $results = new Set();
+        $results->add(new Result($response->getStatusCode(), $url, $response->getHeaders()));
         while ($response->hasHeader('Location') === true) {
-            $trackedUrl[] = $response->getHeader('Location')[0];
-            $url = $trackedUrl[count($trackedUrl) - 1];
-            $response = $client->request('GET', $url, [
-                'allow_redirects' => false,
-            ]);
+            $redirectUrl = $response->getHeader('Location')[0];
+            $response = $client->request('GET', $redirectUrl, ['allow_redirects' => false]);
+            $code = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            $results->add(new Result($code, $redirectUrl, $headers));
         }
 
-        return $trackedUrl;
+        return $results;
     }
 
     /**
      * track method.
-     *
-     * @return array<string>
      */
-    public function track(): array
+    public function track(): Set
     {
         return self::trackFromUrl(self::$url);
     }
@@ -65,9 +61,7 @@ class Tracker
     {
         $validatedResult = filter_var($url, FILTER_VALIDATE_URL);
         if ($validatedResult === false) {
-            $exceptionMessage = sprintf('The %s is invalid.', $url);
-
-            throw new InvalidArgumentException($exceptionMessage);
+            throw new \InvalidArgumentException(sprintf("The giving URL '%s' is invalid.", $url));
         }
 
         return true;
