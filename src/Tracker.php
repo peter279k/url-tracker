@@ -22,9 +22,10 @@ class Tracker
     public static function trackFromUrl(string $url): Set
     {
         self::validateUrl($url);
+
         $client = new Client();
-        $results = new Set();
         $response = $client->request('GET', $url, ['allow_redirects' => false]);
+        $results = new Set();
         $results->add(new Result($response->getStatusCode(), $url, $response->getHeaders()));
         while ($response->hasHeader('Location') === true) {
             $redirectUrl = $response->getHeader('Location')[0];
@@ -60,9 +61,7 @@ class Tracker
     {
         $validatedResult = filter_var($url, FILTER_VALIDATE_URL);
         if ($validatedResult === false) {
-            $exceptionMessage = sprintf('The %s is invalid.', $url);
-
-            throw new \InvalidArgumentException($exceptionMessage);
+            throw new \InvalidArgumentException(sprintf("The giving URL '%s' is invalid.", $url));
         }
 
         return true;
