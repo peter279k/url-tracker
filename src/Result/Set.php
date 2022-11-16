@@ -21,10 +21,7 @@ class Set implements \Countable
     {
         $doceded = @json_decode($this->asJson(), true);
         if (!$doceded) {
-            throw new \RuntimeException(sprintf(
-                'Could not decode JSON results string into an associative array: %s',
-                json_last_error_msg()
-            ));
+            throw new \RuntimeException('Could not decode JSON results string into an associative array: ' . json_last_error_msg());
         }
 
         return $doceded;
@@ -37,10 +34,7 @@ class Set implements \Countable
     {
         $json = json_encode($this->results);
         if ($json === false) {
-            throw new \RuntimeException(sprintf(
-                'Could not encode results into JSON format: %s',
-                json_last_error_msg()
-            ));
+            throw new \RuntimeException('Could not encode results into JSON format: ' . json_last_error_msg());
         }
 
         return $json;
