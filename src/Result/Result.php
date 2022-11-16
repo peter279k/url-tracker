@@ -37,6 +37,9 @@ class Result implements \JsonSerializable
         return $this->headers;
     }
 
+    /**
+     * @return array<string, int|string|array<string, string|string[]>>
+     */
     public function jsonSerialize(): array
     {
         return [

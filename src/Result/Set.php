@@ -16,11 +16,13 @@ class Set implements \Countable
 
     /**
      * @throws \RuntimeException
+     *
+     * @return array<int, array<string, int|string|array<string, string|string[]>>>
      */
     public function asArray(): array
     {
         $doceded = @json_decode($this->asJson(), true);
-        if (!$doceded) {
+        if (!is_array($doceded)) {
             throw new \RuntimeException('Could not decode JSON results string into an associative array: ' . json_last_error_msg());
         }
 
