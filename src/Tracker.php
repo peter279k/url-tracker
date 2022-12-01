@@ -2,66 +2,52 @@
 
 namespace Lee;
 
-use GuzzleHttp\Client;
+use Lee\Request\Client;
 use Lee\Result\Result;
 use Lee\Result\Set;
 
 class Tracker
 {
-    /** @var string */
-    private static $url = '';
+    private Client $client;
 
-    public function __construct(string $url)
+    public function __construct(array $requestOptions = [])
     {
-        self::$url = $url;
-    }
-
-    /**
-     * track url with static method call.
-     */
-    public static function trackFromUrl(string $url): Set
-    {
-        self::validateUrl($url);
-
-        $client = new Client();
-        $response = $client->request('GET', $url, ['allow_redirects' => false]);
-        $results = new Set();
-        $results->add(new Result($response->getStatusCode(), $url, $response->getHeaders()));
-        while ($response->hasHeader('Location') === true) {
-            $redirectUrl = $response->getHeader('Location')[0];
-            $response = $client->request('GET', $redirectUrl, ['allow_redirects' => false]);
-            $code = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            $results->add(new Result($code, $redirectUrl, $headers));
-        }
-
-        return $results;
+        $this->client = new Client($requestOptions);
     }
 
     /**
      * track method.
      */
-    public function track(): Set
+    public function track(string $url): Set
     {
-        return self::trackFromUrl(self::$url);
+        $this->validateUrl($url);
+
+        $results = new Set();
+        $response = $this->client->get($url);
+        $results->add(new Result($response->getStatusCode(), $url, $response->getHeaders()));
+        while ($response->hasHeader('Location') === true) {
+            $redirectUrl = $response->getHeader('Location')[0];
+            $response = $this->client->get($redirectUrl);
+            $results->add(new Result($response->getStatusCode(), $redirectUrl, $response->getHeaders()));
+        }
+
+        return $results;
+    }
+
+    public static function trackFromUrl(string $url, array $requestOptions = []): Set
+    {
+        $tracker = new static($requestOptions);
+
+        return $tracker->track($url);
     }
 
     /**
-     * url getter method.
+     * @throws \InvalidArgumentException
      */
-    public function getUrl(): string
+    private function validateUrl(string $url): bool
     {
-        return self::$url;
-    }
-
-    /**
-     * validate private static url with filter_var function.
-     */
-    private static function validateUrl(string $url): bool
-    {
-        $validatedResult = filter_var($url, FILTER_VALIDATE_URL);
-        if ($validatedResult === false) {
-            throw new \InvalidArgumentException(sprintf("The giving URL '%s' is invalid.", $url));
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            throw new \InvalidArgumentException("The giving URL '$url' is invalid.");
         }
 
         return true;
