@@ -1,5 +1,7 @@
 <?php
 
+// todo add @internal
+
 namespace Lee\Request;
 
 use GuzzleHttp\Client as GuzzleClient;
