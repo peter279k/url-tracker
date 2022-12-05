@@ -10,6 +10,9 @@ class Tracker
 {
     private Client $client;
 
+    /**
+     * @param array<string, mixed> $requestOptions
+     */
     public function __construct(array $requestOptions = [])
     {
         $this->client = new Client($requestOptions);
@@ -34,6 +37,9 @@ class Tracker
         return $results;
     }
 
+    /**
+     * @param array<string, mixed> $requestOptions
+     */
     public static function trackFromUrl(string $url, array $requestOptions = []): Set
     {
         $tracker = new static($requestOptions);
