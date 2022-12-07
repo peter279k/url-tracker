@@ -42,7 +42,7 @@ class Tracker
      */
     public static function trackFromUrl(string $url, array $requestOptions = []): Set
     {
-        $tracker = new static($requestOptions);
+        $tracker = new self($requestOptions);
 
         return $tracker->track($url);
     }
